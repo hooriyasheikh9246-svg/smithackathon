@@ -1,3 +1,4 @@
+import Link from 'next/link'
 'use client'
 import { useState } from 'react'
 import { LayoutDashboard, Users, ShoppingBag, Settings, Menu, X, LogOut } from 'lucide-react'
