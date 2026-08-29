@@ -3,24 +3,30 @@
 import { useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import AuthModal from '@/components/AuthModal'
+import AddBookingModal from '@/components/AddBookingModal'
 import { MOCK_BOOKINGS, STATUS_COLORS } from '@/lib/mockData'
-import { UserCheck, DollarSign, Clock, ArrowUpRight, Search, Filter } from 'lucide-react'
+import { UserCheck, DollarSign, Clock, ArrowUpRight, Search, Filter, Plus } from 'lucide-react'
 
 export default function Home() {
   const [isAuthOpen, setIsAuthOpen] = useState(false)
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [bookings, setBookings] = useState(MOCK_BOOKINGS)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
 
-  // Calculated analytics from mock data
-  const totalRevenue = MOCK_BOOKINGS.reduce((sum, item) => {
-    return sum + parseInt(item.price.replace('$', ''))
+  // Analytics recalculated dynamically from state
+  const totalRevenue = bookings.reduce((sum, item) => {
+    return sum + parseInt(item.price.replace('$', '') || '0')
   }, 0)
   
-  const pendingCount = MOCK_BOOKINGS.filter(b => b.status === 'Pending').length
-  const completedCount = MOCK_BOOKINGS.filter(b => b.status === 'Completed' || b.status === 'Confirmed').length
+  const pendingCount = bookings.filter(b => b.status === 'Pending').length
+  const completedCount = bookings.filter(b => b.status === 'Completed' || b.status === 'Confirmed').length
 
-  // Dynamically filter bookings based on search input and selected status
-  const filteredBookings = MOCK_BOOKINGS.filter((item) => {
+  const handleAddBooking = (newBooking: any) => {
+    setBookings([newBooking, ...bookings])
+  }
+
+  const filteredBookings = bookings.filter((item) => {
     const matchesSearch = item.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           item.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           item.id.toLowerCase().includes(searchTerm.toLowerCase())
@@ -31,14 +37,14 @@ export default function Home() {
 
   return (
     <DashboardLayout title="Boilerplate Overview">
-      {/* Analytics Summary Cards */}
+      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold uppercase text-slate-400">Total Revenue</p>
             <h3 className="text-2xl font-bold text-slate-800 mt-1">${totalRevenue}</h3>
             <span className="inline-flex items-center text-xs text-emerald-600 font-medium mt-2">
-              <ArrowUpRight className="w-3.5 h-3.5 mr-0.5" /> +12% from last week
+              <ArrowUpRight className="w-3.5 h-3.5 mr-0.5" /> Dynamic calculation
             </span>
           </div>
           <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
@@ -73,23 +79,30 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Main Content Area */}
+      {/* Main Table Section */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-        {/* Header & Auth Button */}
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
           <div>
             <h2 className="text-xl font-bold text-slate-800">Hackathon Starter Ready</h2>
             <p className="text-sm text-slate-500">Next.js + Tailwind + Supabase Auth + Layout Shell</p>
           </div>
-          <button
-            onClick={() => setIsAuthOpen(true)}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors self-start sm:self-auto"
-          >
-            Test Auth Modal
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" /> Add Booking
+            </button>
+            <button
+              onClick={() => setIsAuthOpen(true)}
+              className="bg-slate-800 hover:bg-slate-900 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors"
+            >
+              Auth
+            </button>
+          </div>
         </div>
 
-        {/* Search & Filter Tools */}
+        {/* Search & Filter */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -117,7 +130,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Dynamic Table */}
+        {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="text-xs uppercase bg-slate-50 text-slate-400 font-bold border-b border-slate-100">
@@ -156,6 +169,11 @@ export default function Home() {
         </div>
       </div>
 
+      <AddBookingModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAddBooking={handleAddBooking}
+      />
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
     </DashboardLayout>
   )
