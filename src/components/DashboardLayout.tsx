@@ -1,106 +1,130 @@
 'use client'
 
-import { useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
-import { LayoutDashboard, Users, ShoppingBag, Settings, Menu, X, LogOut } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { Home, ClipboardList, UserPlus, Sparkles, UserCheck, Shield } from 'lucide-react'
 
 interface DashboardLayoutProps {
   children: React.ReactNode
-  title?: string
+  title: string
+  userRole: 'Customer' | 'Provider'
+  onRoleToggle: () => void
 }
 
-export default function DashboardLayout({ children, title = 'Dashboard' }: DashboardLayoutProps) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+export default function DashboardLayout({
+  children,
+  title,
+  userRole,
+  onRoleToggle,
+}: DashboardLayoutProps) {
+  const pathname = usePathname()
+
+  const navItems = [
+    { name: 'Browse Experts', href: '/', icon: Home },
+    { name: 'Booking Console', href: '/orders', icon: ClipboardList },
+    { name: 'Join as Provider', href: '/register', icon: UserPlus },
+    { name: 'AI Assistant', href: '/ai-assistant', icon: Sparkles },
+  ]
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
-      {/* Mobile Sidebar Overlay */}
-      {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-slate-900/50 z-40 lg:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
+      {/* Sidebar Navigation */}
+      <aside className="w-64 bg-slate-900 text-white flex flex-col justify-between hidden md:flex border-r border-slate-800">
+        <div>
+          {/* Logo & Brand Name */}
+          <div className="p-6 border-b border-slate-800">
+            <Link flex items-center gap-2 href="/">
+              <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white text-base">
+                K
+              </div>
+              <span className="text-xl font-bold tracking-tight text-white">
+                KarachiServe
+              </span>
+            </Link>
+            <p className="text-[11px] text-slate-400 mt-1">Local Service Marketplace</p>
+          </div>
 
-      {/* Sidebar */}
-      <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white flex flex-col transform transition-transform duration-200 ease-in-out ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
-      >
-        <div className="p-6 flex justify-between items-center border-b border-slate-800">
-          <h1 className="text-xl font-bold tracking-tight text-indigo-400">SMIT Hack Kit</h1>
-          <button 
-            onClick={() => setIsSidebarOpen(false)} 
-            className="lg:hidden text-slate-400 hover:text-white"
-          >
-            <X className="w-6 h-6" />
-          </button>
+          {/* Navigation Menu */}
+          <nav className="p-4 space-y-1">
+            {navItems.map((item) => {
+              const Icon = item.icon
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors ${
+                    isActive
+                      ? 'bg-indigo-600 text-white'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{item.name}</span>
+                </Link>
+              )
+            })}
+          </nav>
         </div>
 
-        {/* Navigation Links */}
-        <nav className="flex-1 p-4 space-y-1">
-          <Link
-            href="/"
-            className="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors font-medium text-sm"
-          >
-            <LayoutDashboard className="w-5 h-5 text-indigo-400" />
-            <span>Overview</span>
-          </Link>
-
-          <Link
-            href="/users"
-            className="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors font-medium text-sm"
-          >
-            <Users className="w-5 h-5 text-indigo-400" />
-            <span>Manage Users</span>
-          </Link>
-
-          <Link
-            href="/orders"
-            className="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors font-medium text-sm"
-          >
-            <ShoppingBag className="w-5 h-5 text-indigo-400" />
-            <span>Orders</span>
-          </Link>
-        </nav>
-
-        {/* Footer Link / User profile area */}
+        {/* Role Switcher Widget */}
         <div className="p-4 border-t border-slate-800">
-          <button 
-            className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-slate-800 hover:text-red-300 rounded-lg transition-colors font-medium text-sm"
-          >
-            <LogOut className="w-5 h-5" />
-            <span>Sign Out</span>
-          </button>
+          <div className="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400">
+                Current Role
+              </span>
+              <span className={`text-[10px] px-2 py-0.5 rounded font-bold ${
+                userRole === 'Customer' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-emerald-500/20 text-emerald-300'
+              }`}>
+                {userRole}
+              </span>
+            </div>
+            <button
+              onClick={onRoleToggle}
+              className="w-full py-1.5 px-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
+            >
+              {userRole === 'Customer' ? (
+                <>
+                  <UserCheck className="w-3.5 h-3.5 text-emerald-400" /> Switch to Provider
+                </>
+              ) : (
+                <>
+                  <Shield className="w-3.5 h-3.5 text-indigo-400" /> Switch to Customer
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </aside>
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Navbar */}
-        <header className="h-16 bg-white border-b border-slate-100 flex items-center justify-between px-6">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setIsSidebarOpen(true)}
-              className="lg:hidden text-slate-600 hover:text-slate-900"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
+        {/* Top Header */}
+        <header className="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between">
+          <div>
             <h1 className="text-xl font-bold text-slate-800">{title}</h1>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="bg-indigo-50 text-indigo-700 text-xs px-3 py-1.5 rounded-full font-semibold">
-              Admin Mode
-            </span>
+          {/* Mobile Navigation Links */}
+          <div className="flex items-center gap-2 md:hidden">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`p-2 rounded-lg text-xs font-semibold ${
+                  pathname === item.href ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-slate-100'
+                }`}
+              >
+                {item.name.split(' ')[0]}
+              </Link>
+            ))}
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 p-6 overflow-y-auto">
-          {children}
-        </main>
+        {/* Dynamic Page Body */}
+        <main className="flex-1 p-6 max-w-7xl w-full mx-auto">{children}</main>
       </div>
     </div>
   )

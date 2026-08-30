@@ -20,15 +20,12 @@ export default function AddBookingModal({ isOpen, onClose, provider, onAddBookin
 
   if (!isOpen || !provider) return null
 
-  // AI Assistant Feature: Detect urgency based on description keywords
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value
     setDescription(text)
 
     const urgentKeywords = ['urgent', 'emergency', 'asap', 'leak', 'leaking', 'short circuit', 'broken', 'immediately']
-    const isUrgentMatch = urgentKeywords.some(word => text.toLowerCase().includes(word))
-    
-    if (isUrgentMatch) {
+    if (urgentKeywords.some(word => text.toLowerCase().includes(word))) {
       setUrgency('Urgent')
     } else {
       setUrgency('Standard')
@@ -40,10 +37,9 @@ export default function AddBookingModal({ isOpen, onClose, provider, onAddBookin
     if (!date || !time || !location || !description) return
 
     const newBooking = {
-      id: `BK-${Math.floor(100 + Math.random() * 900)}`,
-      providerId: provider.id,
-      providerName: provider.name,
-      customerName: 'Hooriya Sheikh',
+      provider_id: provider.id,
+      provider_name: provider.name,
+      customer_name: 'Hooriya Sheikh',
       service: provider.service,
       date,
       time,
