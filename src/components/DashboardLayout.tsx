@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Store, Calendar, UserPlus, ShieldCheck, LogIn, Sparkles } from 'lucide-react'
+import { Store, Calendar, UserPlus, ShieldCheck, LogIn, Sparkles, Info, Users, CheckCircle, MapPin } from 'lucide-react'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -21,9 +21,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Sidebar */}
       <aside 
         style={{ backgroundColor: '#2B1810', borderColor: '#3D2317' }} 
-        className="w-full md:w-64 border-r flex flex-col justify-between shrink-0"
+        className="w-full md:w-72 border-r flex flex-col justify-between shrink-0"
       >
         <div className="p-5 space-y-6">
+          {/* Header */}
           <div className="flex items-center gap-3">
             <div style={{ backgroundColor: '#C68B59' }} className="p-2 rounded-xl text-white">
               <Sparkles className="w-5 h-5" />
@@ -38,6 +39,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
 
+          {/* Navigation Links */}
           <nav className="space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon
@@ -61,8 +63,57 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               )
             })}
           </nav>
+
+          {/* ABOUT ZAROORATHUB BLOCK */}
+          <div style={{ backgroundColor: '#3D2317', borderColor: '#5C3D2E' }} className="rounded-2xl p-4 border space-y-3">
+            {/* About Block Header */}
+            <div className="flex items-center gap-1.5">
+              <Info style={{ color: '#C68B59' }} className="w-4 h-4 shrink-0" />
+              <h3 style={{ color: '#F5EBE0' }} className="text-xs font-bold uppercase tracking-wider">
+                About ZarooratHub
+              </h3>
+            </div>
+
+            {/* Platform Description */}
+            <p style={{ color: '#D7C4B7' }} className="text-[11px] leading-relaxed">
+              Karachi’s all-in-one local marketplace connecting verified technicians, electricians, plumbers, and experts directly with households in real-time.
+            </p>
+
+            {/* Stats Divs */}
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <div style={{ backgroundColor: '#2B1810', borderColor: '#5C3D2E' }} className="p-2 rounded-xl border text-center">
+                <div className="flex items-center justify-center gap-1">
+                  <Users style={{ color: '#C68B59' }} className="w-3 h-3" />
+                  <span style={{ color: '#F5EBE0' }} className="text-xs font-black">14+</span>
+                </div>
+                <span style={{ color: '#D7C4B7' }} className="text-[9px] block uppercase font-medium">Experts</span>
+              </div>
+
+              <div style={{ backgroundColor: '#2B1810', borderColor: '#5C3D2E' }} className="p-2 rounded-xl border text-center">
+                <div className="flex items-center justify-center gap-1">
+                  <CheckCircle style={{ color: '#C68B59' }} className="w-3 h-3" />
+                  <span style={{ color: '#F5EBE0' }} className="text-xs font-black">100%</span>
+                </div>
+                <span style={{ color: '#D7C4B7' }} className="text-[9px] block uppercase font-medium">Verified</span>
+              </div>
+            </div>
+
+            {/* Location Badge */}
+            <div style={{ backgroundColor: '#2B1810' }} className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-[10px] text-[#D7C4B7]">
+              <MapPin style={{ color: '#C68B59' }} className="w-3 h-3" />
+              <span>Serving All Karachi Neighborhoods</span>
+            </div>
+
+            {/* About Block Footer */}
+            <div className="pt-2 border-t border-[#5C3D2E] text-center">
+              <span style={{ color: '#C68B59' }} className="text-[9px] font-bold tracking-widest uppercase block">
+                Aapki Zaroorat, Humari Zimmedari
+              </span>
+            </div>
+          </div>
         </div>
 
+        {/* Sidebar Footer */}
         <div className="p-4 border-t border-[#3D2317] text-center">
           <p style={{ color: '#D7C4B7' }} className="text-[10px]">
             ZarooratHub v1.0 • Powered by Supabase
@@ -75,5 +126,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {children}
       </main>
     </div>
+    
   )
 }
