@@ -58,7 +58,7 @@ export default function AIAssistantPage() {
 
   return (
     <DashboardLayout 
-      title="QuickServe AI Tools"
+      title="ZarooratHub AI Tools"
       userRole={userRole}
       onRoleToggle={() => setUserRole(prev => (prev === 'Customer' ? 'Provider' : 'Customer'))}
     >

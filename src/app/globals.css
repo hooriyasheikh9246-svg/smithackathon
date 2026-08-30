@@ -1,8 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Chocolate Brown, Caramel & Beige Theme Variables */
+  --background: #2B1810;       /* Dark Chocolate Background */
+  --foreground: #F5EBE0;       /* Creamy Beige Text */
+
+  --color-chocolate-dark: #2B1810;
+  --color-chocolate-card: #3D2317;
+  --color-chocolate-border: #5C3D2E;
+  --color-caramel: #C68B59;
+  --color-caramel-hover: #b37847;
+  --color-beige: #F5EBE0;
+  --color-beige-muted: #D7C4B7;
 }
 
 @theme inline {
@@ -10,15 +19,17 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  --color-chocolate-dark: var(--color-chocolate-dark);
+  --color-chocolate-card: var(--color-chocolate-card);
+  --color-chocolate-border: var(--color-chocolate-border);
+  --color-caramel: var(--color-caramel);
+  --color-caramel-hover: var(--color-caramel-hover);
+  --color-beige: var(--color-beige);
+  --color-beige-muted: var(--color-beige-muted);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Force Dark Theme as default */
 body {
   background: var(--background);
   color: var(--foreground);

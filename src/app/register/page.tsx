@@ -72,7 +72,7 @@ export default function RegisterProviderPage() {
           <div className="bg-white border border-slate-100 rounded-2xl p-6 sm:p-8 shadow-sm">
             <div className="mb-6">
               <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded">
-                Join QuickServe Platform
+                Join ZarooratHub Platform
               </span>
               <h2 className="text-xl font-bold text-slate-800 mt-2">Become a Verified Service Provider</h2>
               <p className="text-xs text-slate-500 mt-1">List your skills and start receiving local job requests from Karachi residents.</p>
