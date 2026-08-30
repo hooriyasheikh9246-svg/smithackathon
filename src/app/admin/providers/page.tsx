@@ -3,188 +3,171 @@
 import React, { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { createClient } from '@supabase/supabase-js'
-import { Check, X, ShieldAlert, RefreshCw, UserCheck } from 'lucide-react'
+import { ShieldCheck, Check, X, Trash2, RefreshCw, Star } from 'lucide-react'
 
-interface PendingProvider {
-  id: string
-  name: string
-  service: string
-  category: string
-  phone: string
-  location: string
-  experience: string
-  price?: string
-  hourly_rate?: string
-  approved: boolean
-  created_at?: string
-}
+export default function AdminDashboardPage() {
+  const [providers, setProviders] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-const fallbackApplicants: PendingProvider[] = [
-  {
-    id: 'demo-1',
-    name: 'Hamza Sheikh',
-    service: 'Solar Panel Installation & Wiring',
-    category: 'Electrical',
-    phone: '+923009876543',
-    location: 'Gulshan-e-Iqbal, Karachi',
-    experience: '4 Years',
-    price: 'PKR 2,500/hr',
-    approved: false,
-  },
-  {
-    id: 'demo-2',
-    name: 'Bilal Raza',
-    service: 'Plumbing & Water Tank Cleaning',
-    category: 'Plumbing',
-    phone: '+923123456789',
-    location: 'North Nazimabad, Karachi',
-    experience: '5 Years',
-    price: 'PKR 1,800/hr',
-    approved: false,
-  }
-]
-
-export default function AdminProvidersPage() {
-  const [applicants, setApplicants] = useState<PendingProvider[]>(fallbackApplicants)
-  const [loading, setLoading] = useState(false)
-
-  const fetchApplicants = async () => {
+  const fetchProviders = async () => {
     setLoading(true)
     try {
-      const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-      const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      if (!url || !key) return
 
-      if (url && key) {
-        const supabase = createClient(url, key)
-        const { data, error } = await supabase
-          .from('providers')
-          .select('*')
-          .order('created_at', { ascending: false })
-
-        if (!error && data && data.length > 0) {
-          setApplicants(data)
-        }
+      const supabase = createClient(url, key)
+      const { data, error } = await supabase.from('providers').select('*').order('created_at', { ascending: false })
+      if (!error && data) {
+        setProviders(data)
       }
-    } catch (err) {
-      console.warn('Using fallback data:', err)
+    } catch (e) {
+      console.warn('Failed to load admin data:', e)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   useEffect(() => {
-    fetchApplicants()
+    fetchProviders()
   }, [])
 
   const toggleApproval = async (id: string, currentStatus: boolean) => {
-    setApplicants((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, approved: !currentStatus } : item))
-    )
-
     try {
-      const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-      const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      if (!url || !key) return
 
-      if (url && key) {
-        const supabase = createClient(url, key)
-        await supabase
-          .from('providers')
-          .update({ approved: !currentStatus })
-          .eq('id', id)
-      }
-    } catch (err) {
-      console.error('Update error:', err)
+      const supabase = createClient(url, key)
+      await supabase.from('providers').update({ approved: !currentStatus }).eq('id', id)
+      
+      setProviders(providers.map(p => p.id === id ? { ...p, approved: !currentStatus } : p))
+    } catch (e) {
+      console.error('Update failed:', e)
     }
   }
 
-  const deleteApplicant = async (id: string) => {
-    setApplicants((prev) => prev.filter((item) => item.id !== id))
-
+  const deleteProvider = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this provider?')) return
     try {
-      const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-      const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      if (!url || !key) return
 
-      if (url && key) {
-        const supabase = createClient(url, key)
-        await supabase.from('providers').delete().eq('id', id)
-      }
-    } catch (err) {
-      console.error('Delete error:', err)
+      const supabase = createClient(url, key)
+      await supabase.from('providers').delete().eq('id', id)
+      setProviders(providers.filter(p => p.id !== id))
+    } catch (e) {
+      console.error('Delete failed:', e)
     }
   }
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
+        <div style={{ backgroundColor: '#3D2317' }} className="rounded-2xl p-6 border border-[#5C3D2E] text-white flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-stone-900">Provider Approvals</h1>
-            <p className="text-xs text-stone-500 mt-1">
-              Review new registrations before publishing them to the public marketplace.
+            <span style={{ color: '#C68B59' }} className="text-xs font-bold tracking-wider uppercase flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4" /> Admin Console
+            </span>
+            <h1 style={{ color: '#F5EBE0' }} className="text-2xl font-extrabold mt-1">
+              Provider Verification & Approvals
+            </h1>
+            <p style={{ color: '#D7C4B7' }} className="text-xs mt-1">
+              Approve or reject service providers before they go live on the ZarooratHub marketplace.
             </p>
           </div>
-          <button
-            onClick={fetchApplicants}
-            className="p-2.5 bg-stone-100 hover:bg-stone-200 rounded-xl text-stone-700 transition-colors"
+          <button 
+            onClick={fetchProviders} 
+            className="p-2.5 bg-[#2B1810] hover:bg-[#5C3D2E] text-[#F5EBE0] rounded-xl border border-[#5C3D2E] transition-colors"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
         </div>
 
-        {loading ? (
-          <div className="text-center py-12 text-stone-500 text-sm">Loading applications...</div>
-        ) : applicants.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {applicants.map((item) => (
-              <div key={item.id} className="bg-white rounded-2xl p-5 border border-stone-200 shadow-sm space-y-3">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-bold text-stone-900 text-base">{item.name}</h3>
-                    <p className="text-xs text-stone-500 font-semibold">{item.service}</p>
-                  </div>
-                  {item.approved ? (
-                    <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-                      <UserCheck className="w-3 h-3" /> Live on Web
-                    </span>
-                  ) : (
-                    <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-                      <ShieldAlert className="w-3 h-3" /> Pending Review
-                    </span>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 text-xs text-stone-600 bg-stone-50 p-3 rounded-xl border border-stone-100">
-                  <p><span className="font-bold text-stone-800">Category:</span> {item.category}</p>
-                  <p><span className="font-bold text-stone-800">Rate:</span> {item.price || item.hourly_rate || 'PKR 1,500/hr'}</p>
-                  <p><span className="font-bold text-stone-800">Location:</span> {item.location}</p>
-                  <p><span className="font-bold text-stone-800">Exp:</span> {item.experience}</p>
-                  <p className="col-span-2"><span className="font-bold text-stone-800">Phone:</span> {item.phone}</p>
-                </div>
-
-                <div className="flex items-center justify-end gap-2 pt-2">
-                  <button
-                    onClick={() => toggleApproval(item.id, item.approved)}
-                    style={item.approved ? { backgroundColor: '#78350F' } : { backgroundColor: '#15803D' }}
-                    className="px-3 py-1.5 text-white rounded-xl text-xs font-semibold flex items-center gap-1 transition-colors"
-                  >
-                    <Check className="w-3.5 h-3.5" />
-                    {item.approved ? 'Revoke Approval' : 'Approve & Publish'}
-                  </button>
-
-                  <button
-                    onClick={() => deleteApplicant(item.id)}
-                    className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1 transition-colors"
-                  >
-                    <X className="w-3.5 h-3.5" /> Reject
-                  </button>
-                </div>
-              </div>
-            ))}
+        <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-stone-100 flex justify-between items-center">
+            <h3 className="font-bold text-stone-900 text-sm">Registered Providers ({providers.length})</h3>
           </div>
-        ) : (
-          <div className="bg-white rounded-2xl p-12 text-center text-stone-500 text-sm border border-stone-200">
-            No provider applications pending!
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs text-stone-600">
+              <thead className="bg-stone-50 text-stone-700 uppercase tracking-wider text-[10px] border-b border-stone-200">
+                <tr>
+                  <th className="p-3">Provider</th>
+                  <th className="p-3">Category & Service</th>
+                  <th className="p-3">Location & Phone</th>
+                  <th className="p-3">Rate</th>
+                  <th className="p-3">Status</th>
+                  <th className="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-stone-100">
+                {providers.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="text-center py-8 text-stone-400">
+                      {loading ? 'Fetching records...' : 'No external providers found in Supabase database.'}
+                    </td>
+                  </tr>
+                ) : (
+                  providers.map((p) => (
+                    <tr key={p.id} className="hover:bg-stone-50/50 transition-colors">
+                      <td className="p-3 flex items-center gap-2.5">
+                        <img 
+                          src={p.avatar || p.image || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'} 
+                          alt={p.name} 
+                          className="w-8 h-8 rounded-full object-cover border border-[#C68B59]" 
+                        />
+                        <div>
+                          <p className="font-bold text-stone-900">{p.name}</p>
+                          <span className="text-[10px] text-stone-400">{p.experience} Exp</span>
+                        </div>
+                      </td>
+                      <td className="p-3">
+                        <p className="font-semibold text-stone-800">{p.service}</p>
+                        <span style={{ color: '#C68B59' }} className="text-[10px] font-bold bg-amber-50 px-2 py-0.5 rounded-md inline-block">
+                          {p.category}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        <p className="text-stone-800">{p.location}</p>
+                        <p className="text-stone-400 text-[10px]">{p.phone}</p>
+                      </td>
+                      <td className="p-3 font-bold text-stone-900">{p.price || p.hourly_rate}</td>
+                      <td className="p-3">
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                          p.approved 
+                            ? 'bg-emerald-100 text-emerald-800' 
+                            : 'bg-amber-100 text-amber-800'
+                        }`}>
+                          {p.approved ? 'Approved' : 'Pending Approval'}
+                        </span>
+                      </td>
+                      <td className="p-3 text-right space-x-1">
+                        <button
+                          onClick={() => toggleApproval(p.id, p.approved)}
+                          className={`p-1.5 rounded-lg border text-xs font-semibold ${
+                            p.approved
+                              ? 'bg-stone-100 text-stone-600 border-stone-200 hover:bg-stone-200'
+                              : 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700'
+                          }`}
+                        >
+                          {p.approved ? <X className="w-3.5 h-3.5" /> : <Check className="w-3.5 h-3.5" />}
+                        </button>
+                        <button
+                          onClick={() => deleteProvider(p.id)}
+                          className="p-1.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
-        )}
+        </div>
       </div>
     </DashboardLayout>
   )
